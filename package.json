@@ -1,0 +1,19 @@
+{
+  "name": "shareMyFiles",
+  "version": "1.0.0",
+  "description": "node app ",
+  "main": "app.js",
+  "scripts": {
+  "start": "node app.js"
+},
+  "repository": {
+  "type": "git",
+  "url": ""
+},
+  "author": "shareMyFiles",
+  "license": "ISC",
+  "bugs": {
+  "url": ""
+},
+  "homepage": ""
+}
