@@ -6,8 +6,7 @@ const PORT = process.env.PORT || 5000
 
 
 const net = require("net")
-const net_Server = net.createServer()
-net_Server.on("connection", socket => {
+const net_Server = net.createServer( (socket) => {
     // console.log(JSON.stringify(socket)) //This won't work as active socket(meaning that it is not closed) is cirular in nature
     console.log("\n========= NEW CONNECTION =========")
     socket.write("This is the data from the server!") //But this message will only reach him once client's ready event has fired. But here ready event is never fired. Also client can still send the message even before his own ready event has actually fired.
