@@ -9,11 +9,12 @@ var _options = {
     method: 'POST',
     'content-type': 'application/json',
 }
-
+var socket = null
 
 const net = require("net")
 const net_Server = net.createServer()
-net_Server.on("connection", socket => {
+net_Server.on("connection", sokt => {
+    socket = sokt
     // console.log(JSON.stringify(socket)) //This won't work as active socket(meaning that it is not closed) is cirular in nature
     console.log("\n========= NEW CONNECTION =========")
     socket.write("This is the data from the server!") //But this message will only reach him once client's ready event has fired. But here ready event is never fired. Also client can still send the message even before his own ready event has actually fired.
@@ -24,11 +25,11 @@ net_Server.on("connection", socket => {
         console.log("Socket has closed!")
         // console.log(socket)
         socket.destroy() //After the destruction , the socket changes to non circular json object, so we can stringify it
-        console.log("After Destroy: ", JSON.stringify(socket).substring(0, 29))
+        console.log("After Destroy: ", JSON.stringify(socket))
         socket = null //Setting it to null opens the garbage collector to collect this socket and remove it?
         setTimeout(() => {
             if (!socket) { console.log("Socket is not defined") } //This will fire
-            console.log("After SetTimeout: ", JSON.stringify(socket).substring(0, 29))
+            console.log("After SetTimeout: ", JSON.stringify(socket))
         }, 1000)
     })
     socket.on("open", () => {
