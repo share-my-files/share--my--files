@@ -1,16 +1,19 @@
 {
-  "name": "shareMyFiles",
+  "name": "share--my--files",
   "version": "1.0.0",
   "description": "node app ",
+  "engines": {
+    "node": "15.2.1"
+  },
   "main": "app.js",
   "scripts": {
-  "start": "node app.js"
+  "start": "node main-server.js"
 },
   "repository": {
   "type": "git",
   "url": ""
 },
-  "author": "shareMyFiles",
+  "author": "share-my-files",
   "license": "ISC",
   "bugs": {
   "url": ""
