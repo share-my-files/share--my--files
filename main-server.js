@@ -44,7 +44,7 @@ net_Server.on("connection", socket => {
     })
 })
 net_Server.listen(PORT, listeningListerner = () => {
-    console.log("Port 5000 , Socket Server Opened! \n")
+    console.log("Port: ", PORT , "Socket Server Opened! \n")
 })
 
 function ConverArrayBufferToString(decrypted) {
