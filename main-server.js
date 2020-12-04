@@ -94,25 +94,50 @@ var policyLimit = 0
 // const WebSocket = require('ws');
 const { Server } = require('ws');
 const wss = new Server({ server });
-
+var securityChecker = 0
 // const wss = new WebSocket.Server({ port: PORT });
 
-wss.on('connection', function connection(localWs,req) {
-ws = localWs
-ws.isAlive = true;
-console.log("Received Message From: ", req.socket.remoteAddress)
-ws.send("Connection Established")
-ws.on("error", () => {
-ws.terminate();
-ws = null
-ws = undefined
+wss.on('connection', function connection(localWs, req) {
+let tempWS = localWs
+let tempSecurityChecker = 0
+// ws = localWs
+tempWS.isAlive = true;
+console.log("Received Connection From: ", req.socket.remoteAddress)
+tempWS.send("Connection Established 222394")
+tempWS.on("error", () => {
+tempWS.terminate();
+tempWS = null
+tempWS = undefined
+tempSecurityChecker = 0
 console.log("Error::: Socket Problem")
 })
-ws.on('message', function incoming(data) {
-if (data == "Connection Open") {
-console.log("Received the opening message from the client.")
+tempWS.on('message', function incoming(data) {
+if (data == "Connection Open 3368390448322920") {
+securityChecker = 1
+ws = localWs
+tempWS = null
+tempWS = undefined
+console.log("Connection Established.")
 return;
+} else if (data == "Ping 1645211843") {
+if (typeof ws != "undefined" && typeof tempWS == 'undefined') {
+console.log("Received Ping")
+ws.send("Pong 71156165")
+} else {
+console.log("Received Ping From  Unknown Server :" , req.socket.remoteAddress)
 }
+return;
+} else if (typeof tempWS != "undefined" || securityChecker != 1) {
+if (typeof ws != "undefined") {
+ws.send("Bad Request 404 From : ", req.socket.remoteAddress)
+}
+// tempWS.send("Bad Request 404")  //We won't tell him, we will just close the connection
+console.log("Bad Request 404 From : ", req.socket.remoteAddress)
+tempWS.terminate();
+tempWS = null
+tempWS = undefined
+return;
+} else if (typeof ws != "undefined" && securityChecker == 1) { //We open connection so securityCheck = 1, but what if other server connected , it will pass the securityChecker if statement and reach here and not Crash the server. As we use another if statement for the uniqueIDForClientResponse
 let uniqueIdProvidedByApi = data.split("&>&")[1]
 if (ClientsStorage[uniqueIdProvidedByApi]) {
 let originalRequest = ClientsStorage[uniqueIdProvidedByApi]["request"]
@@ -179,18 +204,21 @@ ErrorHandle("ERROR:: WHILE SPLITTING THE MESSAGE", "1", originalRequest, origina
 return;
 }
 }
+}
 })
 });
 wss.on("close", () => {
 ws.terminate();
 ws = null
 ws = undefined
+securityChecker = 0
 console.log("Connection To The Server Closed/Lost")
 })
 wss.on("error", () => {
 ws.terminate();
 ws = null
 ws = undefined
+securityChecker = 0
 console.log("Error::: Big Socket Problem Problem")
 })
 
@@ -200,8 +228,8 @@ console.log("Error::: Big Socket Problem Problem")
 
 function HandleRequest(incomingMessage, response) {
 // time = performance.now()
-if (typeof ws == "undefined") {
-ErrorHandle("Server has not connected.", "1", incomingMessage, response)
+if (typeof ws == "undefined" || securityChecker == 0) {
+ErrorHandle("Server has not connected Or SecurityChecker is 0.", "1", incomingMessage, response)
 return;
 } else if (ws.isAlive === false) {
 ws.terminate();
