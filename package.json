@@ -15,6 +15,9 @@
 },
   "author": "share-my-files",
   "license": "ISC",
+  "dependencies" : {
+  "ws": "^7.4.0"
+}
   "bugs": {
   "url": ""
 },
