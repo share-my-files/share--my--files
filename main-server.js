@@ -1,4 +1,3 @@
-
 const http = require('http')
 const crypto = require('crypto');
 const { Console } = require('console');
@@ -98,18 +97,23 @@ const wss = new Server({ server });
 
 // const wss = new WebSocket.Server({ port: PORT });
 
-wss.on('connection', function connection(localWs) {
+wss.on('connection', function connection(localWs,req) {
 ws = localWs
-console.log("Received a message")
+ws.isAlive = true;
+console.log("Received Message From: ", req.socket.remoteAddress)
+ws.send("Connection Established")
 ws.on("error", () => {
+ws.terminate();
+ws = null
+ws = undefined
 console.log("Error::: Socket Problem")
 })
 ws.on('message', function incoming(data) {
-if (data == "Connection Open"){
+if (data == "Connection Open") {
 console.log("Received the opening message from the client.")
 return;
 }
-let uniqueIdProvidedByApi = data.split( "&>&" )[1]
+let uniqueIdProvidedByApi = data.split("&>&")[1]
 if (ClientsStorage[uniqueIdProvidedByApi]) {
 let originalRequest = ClientsStorage[uniqueIdProvidedByApi]["request"]
 let originalResponse = ClientsStorage[uniqueIdProvidedByApi]["response"]
@@ -177,7 +181,16 @@ return;
 }
 })
 });
+wss.on("close", () => {
+ws.terminate();
+ws = null
+ws = undefined
+console.log("Connection To The Server Closed/Lost")
+})
 wss.on("error", () => {
+ws.terminate();
+ws = null
+ws = undefined
 console.log("Error::: Big Socket Problem Problem")
 })
 
@@ -188,8 +201,13 @@ console.log("Error::: Big Socket Problem Problem")
 function HandleRequest(incomingMessage, response) {
 // time = performance.now()
 if (typeof ws == "undefined") {
-console.log('Server has not connected.')
 ErrorHandle("Server has not connected.", "1", incomingMessage, response)
+return;
+} else if (ws.isAlive === false) {
+ws.terminate();
+ws = null
+ws = undefined
+ErrorHandle("Socket is not alive. Connection Lost/Closed.", "1", incomingMessage, response)
 return;
 }
 console.log("======Request Received======")
@@ -329,7 +347,7 @@ initialApiAddress = getTheInitialApiAddress(initialApiAddress)
 }
 originalResponse["uniqueID"] = initialApiAddress
 ClientsStorage[initialApiAddress] = { "response": originalResponse, "request": originalRequest, "body": requestToSendToMainServer }
-TimersStorage[initialApiAddress] = setTimeout( ClearTheClientFromStorage, 28000, initialApiAddress)
+TimersStorage[initialApiAddress] = setTimeout(ClearTheClientFromStorage, 28000, initialApiAddress)
 requestToSendToMainServer = initialApiAddress.toString() + "&>&" + requestToSendToMainServer
 
 ws.send(requestToSendToMainServer.toString())
@@ -350,7 +368,7 @@ let url = req.url
 let headers = req.headers
 let method = req.method
 let uniqueId = headers.uniqueRequestId
-if (typeof uniqueId == "undefined"){
+if (typeof uniqueId == "undefined") {
 uniqueId = "notDefined"
 console.log("notDefined unique id")
 }
@@ -463,4 +481,3 @@ callback("notDefined", err)
 req.write(body)
 req.end()
 }
-
